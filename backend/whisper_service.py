@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import io
 import os
-import tempfile
 import threading
 from dataclasses import asdict, dataclass
+from io import BytesIO
 from typing import Any, Dict, List, Optional
+
+import numpy as np
+import soundfile as sf
+from scipy.signal import resample_poly
 
 try:  # pragma: no cover - import errors handled gracefully
     import whisper  # type: ignore
@@ -78,6 +82,7 @@ class WhisperService:
         self._sessions: Dict[str, _StreamingSession] = {}
         self._session_lock = threading.Lock()
         self._min_buffer_bytes = 32_000
+        self._target_sample_rate = 16000
 
     def _load_model(self):
         if self._model is None:
@@ -93,19 +98,13 @@ class WhisperService:
         content_type: Optional[str] = None,
     ) -> TranscriptionResult:
         model = self._load_model()
-        suffix = self._suffix_from_content_type(content_type)
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-            tmp.write(audio_bytes)
-            tmp.flush()
-            temp_path = tmp.name
-
-        try:
-            result = model.transcribe(temp_path, language=language, task="transcribe")
-        finally:
-            try:
-                os.remove(temp_path)
-            except OSError:
-                pass
+        audio_array = self._decode_audio_bytes(audio_bytes)
+        result = model.transcribe(
+            audio_array,
+            language=language,
+            task="transcribe",
+            fp16=False,
+        )
 
         return self._to_transcription_result(result)
 
@@ -196,19 +195,17 @@ class WhisperService:
             detected_language=raw_result.get("language"),
         )
 
-    @staticmethod
-    def _suffix_from_content_type(content_type: Optional[str]) -> str:
-        if not content_type:
-            return ".tmp"
+    def _decode_audio_bytes(self, audio_bytes: bytes) -> np.ndarray:
+        try:
+            audio, sample_rate = sf.read(BytesIO(audio_bytes), dtype="float32")
+        except RuntimeError as exc:
+            raise ValueError("Unable to decode audio payload. Ensure the file is a valid WAV/MP3/FLAC clip.") from exc
 
-        mapping = {
-            "audio/wav": ".wav",
-            "audio/x-wav": ".wav",
-            "audio/mpeg": ".mp3",
-            "audio/mp3": ".mp3",
-            "audio/flac": ".flac",
-            "audio/ogg": ".ogg",
-            "audio/webm": ".webm",
-        }
-        return mapping.get(content_type.lower(), ".tmp")
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+
+        if sample_rate != self._target_sample_rate:
+            audio = resample_poly(audio, self._target_sample_rate, sample_rate)
+
+        return audio
 
