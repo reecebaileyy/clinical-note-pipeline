@@ -1,0 +1,1 @@
+Doctor: Good morning Ms. Rivera, how are you feeling today?\nPatient: The cough is easier but I still wake up at night congested.\nDoctor: Any shortness of breath or fevers?\nPatient: No fever, just the nighttime congestion and a mild headache.\nDoctor: Let us continue the inhaled steroid and add a saline nasal rinse before bed.

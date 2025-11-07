@@ -1,0 +1,1 @@
+Doctor: Hi Mr. Chen, thanks for joining the telehealth visit.\nPatient: Glad to connect, my blood sugars have been steady around 115 in the morning.\nDoctor: Any dizziness or changes in vision?\nPatient: No dizziness, just a little tingling in my feet when I walk longer distances.\nDoctor: Increase nightly foot checks and schedule the podiatry referral we discussed.
