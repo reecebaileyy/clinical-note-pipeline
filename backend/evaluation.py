@@ -12,7 +12,7 @@ from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, declarative_base, relationship, sessionmaker
 
-from summarizer_service import SOAPNote
+from backend.summarizer_service import SOAPNote
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class TranscriptLog(Base):
     transcript = Column(Text, nullable=False)
     language = Column(String(32), nullable=True)
     detected_language = Column(String(32), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    extras = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
@@ -144,7 +144,7 @@ class EvaluationLogger:
                 transcript=transcript,
                 language=language,
                 detected_language=detected_language,
-                metadata=metadata,
+                extras=metadata,
             )
             session.add(record)
             session.flush()

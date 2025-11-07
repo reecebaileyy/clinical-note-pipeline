@@ -13,9 +13,9 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from evaluation import EvaluationLogger
-from summarizer_service import SOAPNote, SummarizerService
-from whisper_service import StreamingUpdate, WhisperService
+from backend.evaluation import EvaluationLogger
+from backend.summarizer_service import SOAPNote, SummarizerService
+from backend.whisper_service import StreamingUpdate, WhisperService
 
 
 logger = logging.getLogger(__name__)

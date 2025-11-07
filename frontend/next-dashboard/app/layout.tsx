@@ -1,1 +1,19 @@
-import './globals.css';\nimport type { Metadata } from 'next';\n\nexport const metadata: Metadata = {\n  title: 'Clinical Note Dashboard',\n  description: 'Monitor real-time transcriptions and SOAP note summaries.',\n};\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang='en'>\n      <body>{children}</body>\n    </html>\n  );\n}\n
+import './globals.css';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Clinical Note Dashboard',
+  description: 'Monitor real-time transcriptions and SOAP note summaries.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
